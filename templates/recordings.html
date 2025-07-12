@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Grabaciones - Grabador de Audio{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Grabaciones Guardadas
+                </h3>
+                <button class="btn btn-light btn-sm" onclick="refreshRecordings()">
+                    <i class="fas fa-sync-alt me-1"></i>Actualizar
+                </button>
+            </div>
+            <div class="card-body">
+                {% if recordings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Proyecto</th>
+                                    <th>Fecha</th>
+                                    <th>Duración</th>
+                                    <th>Tamaño</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for recording in recordings %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ recording.project_name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ recording.filename }}</small>
+                                    </td>
+                                    <td>
+                                        {{ recording.created_at.split('T')[0] if recording.created_at else 'N/A' }}
+                                        <br>
+                                        <small class="text-muted">
+                                            {{ recording.created_at.split('T')[1][:8] if recording.created_at else 'N/A' }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ recording.duration }}s</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">--</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">Completado</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="playRecording('{{ recording.filename }}')" title="Reproducir">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm" onclick="downloadRecording('{{ recording.filename }}')" title="Descargar">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm" onclick="transcribeRecording('{{ recording.filename }}', '{{ recording.project_name }}')" title="Transcribir">
+                                                <i class="fas fa-file-text"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm" onclick="transcribeDirect('{{ recording.filename }}', '{{ recording.project_name }}')" title="Transcripción Directa">
+                                                <i class="fas fa-bolt"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" onclick="deleteRecording('{{ recording.filename }}')" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-microphone-slash fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay grabaciones guardadas</h5>
+                        <p class="text-muted">Comienza grabando audio desde la página principal</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Nueva Grabación
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para reproducir audio -->
+<div class="modal fade" id="audioModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-play me-2"></i>Reproducir Grabación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <audio id="audioPlayer" controls style="width: 100%;">
+                        Tu navegador no soporta el elemento de audio.
+                    </audio>
+                </div>
+                <div class="mt-3">
+                    <h6>Información de la grabación:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Proyecto:</strong> <span id="modalProjectName">-</span></li>
+                        <li><strong>Duración:</strong> <span id="modalDuration">-</span></li>
+                        <li><strong>Fecha:</strong> <span id="modalDate">-</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="downloadFromModal()">
+                    <i class="fas fa-download me-1"></i>Descargar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para transcripción -->
+<div class="modal fade" id="transcribeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-text me-2"></i>Transcribir Grabación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-cloud me-2"></i>Configuración AWS S3</h6>
+                        <div class="mb-3">
+                            <label for="awsAccessKey" class="form-label">Access Key ID</label>
+                            <input type="text" class="form-control" id="awsAccessKey" placeholder="AKIA...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="awsSecretKey" class="form-label">Secret Access Key</label>
+                            <input type="password" class="form-control" id="awsSecretKey" placeholder="...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="awsRegion" class="form-label">Región</label>
+                            <select class="form-select" id="awsRegion">
+                                <option value="us-east-1">US East (N. Virginia)</option>
+                                <option value="us-west-2">US West (Oregon)</option>
+                                <option value="eu-west-1">Europe (Ireland)</option>
+                                <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="awsBucket" class="form-label">Bucket Name</label>
+                            <input type="text" class="form-control" id="awsBucket" placeholder="mi-bucket-audio">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-robot me-2"></i>Configuración OpenAI</h6>
+                        <div class="mb-3">
+                            <label for="openaiApiKey" class="form-label">API Key</label>
+                            <input type="password" class="form-control" id="openaiApiKey" placeholder="sk-...">
+                            <small class="form-text text-muted">Tu API key de OpenAI para Whisper</small>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Proceso:</strong>
+                            <ol class="mb-0 mt-2">
+                                <li>El archivo se subirá a S3</li>
+                                <li>Se llamará a la API de OpenAI Whisper</li>
+                                <li>La transcripción se guardará localmente</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Barra de progreso -->
+                <div id="transcribeProgress" style="display: none;">
+                    <h6><i class="fas fa-tasks me-2"></i>Progreso</h6>
+                    <div class="progress mb-2">
+                        <div id="transcribeProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div id="transcribeProgressText" class="text-muted small"></div>
+                </div>
+                
+                <!-- Resultado de transcripción -->
+                <div id="transcribeResult" style="display: none;">
+                    <h6><i class="fas fa-check-circle me-2 text-success"></i>Transcripción Completada</h6>
+                    <div class="alert alert-success">
+                        <div id="transcriptText" class="mb-2"></div>
+                        <button class="btn btn-sm btn-outline-success" onclick="downloadTranscript()">
+                            <i class="fas fa-download me-1"></i>Descargar Transcripción
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info" id="startTranscribeBtn" onclick="startTranscription()">
+                    <i class="fas fa-play me-1"></i>Iniciar Transcripción
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/recordings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/transcribe.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,1 @@
+Hi, I'm Mario Campos. I'll be working on the Mendel project. This project is intended to add neurosymbolic capabilities to large network models. So you capture the embedding of the last layers and try to represent symbolic knowledge in order to enhance the reasoning capabilities of the model.

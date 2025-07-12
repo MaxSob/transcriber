@@ -1,0 +1,8 @@
+Flask
+Flask-WTF
+Werkzeug
+Jinja2
+boto3
+openai
+python-dotenv
+requests

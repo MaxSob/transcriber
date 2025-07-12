@@ -1,0 +1,1 @@
+Hi, I'm Mario Campos and now I'm working in the MENDE project. It's a project to add neurosymbolic capabilities to LLM. The main idea is to insert an encoder-decoder architecture in the center of the LLM so I can connect embeddings into neurosymbolic expressions and that way using a rated output to enhance the original capabilities of the model.

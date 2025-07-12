@@ -1,0 +1,1 @@
+Hi, I'm Ari Campos, and I've been working with the Mende project, in which I will use neurosymbolic strategies in order to capture the last embedding layers of a large-limit model and add Riffling capabilities.

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración - Grabador de Audio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-cog me-2"></i>
+                            Configuración del Sistema
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="configForm">
+                            <!-- Configuración del temporizador -->
+                            <div class="mb-4">
+                                <h5><i class="fas fa-clock me-2"></i>Configuración del Temporizador</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="defaultDuration" class="form-label">Duración por defecto (segundos)</label>
+                                        <input type="number" class="form-control" id="defaultDuration" value="60" min="10" max="3600">
+                                        <div class="form-text">Duración predeterminada del temporizador</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="countdownSound" class="form-label">Sonido de cuenta regresiva</label>
+                                        <select class="form-select" id="countdownSound">
+                                            <option value="beep">Beep</option>
+                                            <option value="bell">Campana</option>
+                                            <option value="none">Sin sonido</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuración de audio -->
+                            <div class="mb-4">
+                                <h5><i class="fas fa-microphone-alt me-2"></i>Configuración de Audio</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="sampleRate" class="form-label">Frecuencia de muestreo</label>
+                                        <select class="form-select" id="sampleRate">
+                                            <option value="44100">44.1 kHz (CD Quality)</option>
+                                            <option value="48000">48 kHz (Professional)</option>
+                                            <option value="22050">22.05 kHz (Radio Quality)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="bitDepth" class="form-label">Profundidad de bits</label>
+                                        <select class="form-select" id="bitDepth">
+                                            <option value="16">16 bits</option>
+                                            <option value="24">24 bits</option>
+                                            <option value="32">32 bits</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="channels" class="form-label">Canales de audio</label>
+                                        <select class="form-select" id="channels">
+                                            <option value="1">Mono</option>
+                                            <option value="2" selected>Estéreo</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="format" class="form-label">Formato de archivo</label>
+                                        <select class="form-select" id="format">
+                                            <option value="wav">WAV</option>
+                                            <option value="mp3">MP3</option>
+                                            <option value="ogg">OGG</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuración de almacenamiento -->
+                            <div class="mb-4">
+                                <h5><i class="fas fa-hdd me-2"></i>Configuración de Almacenamiento</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="maxFileSize" class="form-label">Tamaño máximo de archivo (MB)</label>
+                                        <input type="number" class="form-control" id="maxFileSize" value="50" min="1" max="500">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="autoSave" class="form-label">Guardado automático</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="autoSave" checked>
+                                            <label class="form-check-label" for="autoSave">
+                                                Guardar automáticamente las grabaciones
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuración de notificaciones -->
+                            <div class="mb-4">
+                                <h5><i class="fas fa-bell me-2"></i>Configuración de Notificaciones</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="timerNotifications" checked>
+                                            <label class="form-check-label" for="timerNotifications">
+                                                Notificaciones del temporizador
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="recordingNotifications" checked>
+                                            <label class="form-check-label" for="recordingNotifications">
+                                                Notificaciones de grabación
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" onclick="resetToDefaults()">
+                                    <i class="fas fa-undo me-1"></i>Restaurar valores por defecto
+                                </button>
+                                <div>
+                                    <button type="button" class="btn btn-outline-primary me-2" onclick="testAudio()">
+                                        <i class="fas fa-volume-up me-1"></i>Probar Audio
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Guardar Configuración
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/config.js') }}"></script>
+{% endblock %} 

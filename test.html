@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Grabación</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>Prueba de Grabación de Audio</h1>
+    
+    <div id="status" class="status info">Inicializando...</div>
+    
+    <div>
+        <button id="startBtn" class="btn-primary">Iniciar Grabación</button>
+        <button id="stopBtn" class="btn-danger" disabled>Detener Grabación</button>
+        <button id="playBtn" class="btn-success" disabled>Reproducir</button>
+    </div>
+    
+    <div id="audioContainer" style="margin-top: 20px;"></div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        let audioUrl;
+        let isRecording = false;
+
+        const statusDiv = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const playBtn = document.getElementById('playBtn');
+        const audioContainer = document.getElementById('audioContainer');
+
+        function updateStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function updateButtons() {
+            startBtn.disabled = isRecording;
+            stopBtn.disabled = !isRecording;
+            playBtn.disabled = !audioBlob;
+        }
+
+        async function startRecording() {
+            try {
+                updateStatus('Solicitando permisos de micrófono...', 'info');
+                
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        sampleRate: 44100,
+                        channelCount: 2,
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    } 
+                });
+
+                updateStatus('Permisos concedidos. Iniciando grabación...', 'success');
+
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    console.log('Datos recibidos:', event.data.size, 'bytes');
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstart = () => {
+                    console.log('Grabación iniciada');
+                    isRecording = true;
+                    updateStatus('Grabando...', 'success');
+                    updateButtons();
+                };
+
+                mediaRecorder.onstop = () => {
+                    console.log('Grabación detenida');
+                    isRecording = false;
+                    updateStatus('Grabación completada. Procesando...', 'info');
+                    updateButtons();
+                    
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    updateStatus(`Grabación completada. Tamaño: ${audioBlob.size} bytes`, 'success');
+                    updateButtons();
+                };
+
+                mediaRecorder.onerror = (event) => {
+                    console.error('Error en grabación:', event);
+                    updateStatus('Error en la grabación', 'error');
+                };
+
+                mediaRecorder.start(1000);
+
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function playRecording() {
+            if (audioUrl) {
+                audioContainer.innerHTML = `
+                    <audio controls style="width: 100%; max-width: 500px;">
+                        <source src="${audioUrl}" type="audio/webm">
+                        Tu navegador no soporta el elemento de audio.
+                    </audio>
+                `;
+            }
+        }
+
+        startBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+        playBtn.addEventListener('click', playRecording);
+
+        // Verificar compatibilidad
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            updateStatus('Tu navegador no soporta grabación de audio', 'error');
+            startBtn.disabled = true;
+        } else {
+            updateStatus('Listo para grabar', 'success');
+        }
+    </script>
+</body>
+</html> 

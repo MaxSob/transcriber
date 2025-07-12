@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Subir a la Nube - Grabador de Audio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>
+                    Subir Archivos de Audio a la Nube
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Selección de proveedor -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-cloud me-2"></i>Proveedor de Nube</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="cloudProvider" class="form-label">Selecciona tu proveedor</label>
+                            <select class="form-select" id="cloudProvider">
+                                <option value="">-- Selecciona un proveedor --</option>
+                                <option value="aws-s3">Amazon S3</option>
+                                <option value="google-cloud">Google Cloud Storage</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de credenciales -->
+                <div class="mb-4" id="credentialsForm" style="display: none;">
+                    <h5><i class="fas fa-key me-2"></i>Configuración de Credenciales</h5>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Nota:</strong> Las credenciales se envían de forma segura y no se almacenan en el servidor.
+                    </div>
+                    <!-- El contenido se genera dinámicamente por JavaScript -->
+                </div>
+
+                <!-- Área de drag and drop -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-file-audio me-2"></i>Seleccionar Archivos</h5>
+                    <div id="dropZone" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h6>Arrastra archivos de audio aquí</h6>
+                            <p class="text-muted">o haz clic para seleccionar archivos</p>
+                            <small class="text-muted">Formatos soportados: MP3, WAV, OGG, M4A, WEBM</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de archivos seleccionados -->
+                <div class="mb-4" id="fileListContainer" style="display: none;">
+                    <h5><i class="fas fa-list me-2"></i>Archivos Seleccionados</h5>
+                    <div id="fileList" class="file-list">
+                        <!-- Los archivos se muestran aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Barra de progreso -->
+                <div class="mb-4" id="progressContainer" style="display: none;">
+                    <h5><i class="fas fa-tasks me-2"></i>Progreso de Subida</h5>
+                    <div class="progress mb-2">
+                        <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div id="progressText" class="text-muted small"></div>
+                </div>
+
+                <!-- Botón de subida -->
+                <div class="text-center">
+                    <button id="uploadToCloud" class="btn btn-info btn-lg" disabled>
+                        <i class="fas fa-cloud-upload-alt me-1"></i>Subir a la Nube
+                    </button>
+                </div>
+
+                <!-- Estado de la subida -->
+                <div class="mt-4">
+                    <div id="uploadStatus" class="alert alert-info" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="statusText">Listo para subir archivos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de ayuda -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>Información de Ayuda
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fab fa-aws me-2"></i>Amazon S3</h6>
+                        <ul class="small text-muted">
+                            <li>Necesitas un Access Key ID y Secret Access Key</li>
+                            <li>Crea un bucket en tu región preferida</li>
+                            <li>Configura los permisos de bucket apropiados</li>
+                            <li>Los archivos se subirán con nombres únicos</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fab fa-google me-2"></i>Google Cloud Storage</h6>
+                        <ul class="small text-muted">
+                            <li>Necesitas un Project ID y un bucket</li>
+                            <li>Crea un Service Account con permisos de Storage</li>
+                            <li>Descarga el archivo JSON de credenciales</li>
+                            <li>Pega el contenido JSON en el campo correspondiente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %} 
