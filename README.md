@@ -1,9 +1,11 @@
-# Grabador de Audio con Temporizador y Transcripción
+# Transcriber: Grabador de Audio con Temporizador y Transcripción
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-Whisper-orange.svg)](https://openai.com/)
+
+**Autor:** [Mario Campos](https://mcampos.cloud) - [mario.campos.soberanis@gmail.com](mailto:mario.campos.soberanis@gmail.com)
 
 Una aplicación web completa para grabar audio con temporizador configurable, subir archivos a la nube y transcribir audio usando OpenAI Whisper.
 
@@ -113,7 +115,7 @@ La aplicación estará disponible en: `http://127.0.0.1:5000`
 ## Estructura del Proyecto
 
 ```
-transcribe/
+transcriber/
 ├── app.py                 # Aplicación principal Flask
 ├── requirements.txt       # Dependencias de Python
 ├── .env                  # Variables de entorno
@@ -166,7 +168,7 @@ http://127.0.0.1:5000/test.html
 ## Tecnologías Utilizadas
 
 - **Backend**: Flask, Python
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+), Jinja
 - **UI Framework**: Bootstrap 5
 - **Iconos**: Font Awesome 6
 - **Audio**: MediaRecorder API, Web Audio API
@@ -211,7 +213,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 ### ¿Qué significa la Licencia MIT?
 
-La Licencia MIT es una de las licencias de código abierto más permisivas. Te permite:
+La Licencia MIT te permite:
 
 - ✅ **Usar** el software para cualquier propósito
 - ✅ **Modificar** el código fuente
@@ -227,6 +229,6 @@ Si usas este proyecto en tu trabajo, considera incluir una referencia:
 
 ```markdown
 Grabador de Audio con Temporizador y Transcripción
-https://github.com/tu-usuario/transcribe
+https://github.com/MaxSob/transcriber
 Licencia MIT
 ``` 
