@@ -228,7 +228,8 @@ La Licencia MIT te permite:
 Si usas este proyecto en tu trabajo, considera incluir una referencia:
 
 ```markdown
-Grabador de Audio con Temporizador y Transcripción
+Transcriber: Grabador de Audio con Temporizador y Transcripción
+Autor: Mario Campos (https://mcampos.cloud)
 https://github.com/MaxSob/transcriber
 Licencia MIT
 ``` 
